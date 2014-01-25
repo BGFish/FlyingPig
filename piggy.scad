@@ -1,3 +1,4 @@
+//translate([0,0,-100])import("scorpion/Final_V_tail_Complete.stl");
 //import("scorpion/Front_Body.stl");
 //import("scorpion/Front_Legs.stl");
 //import("scorpion/Front_Top.stl");
@@ -23,7 +24,7 @@ motor_mount_height=16; // dimension D
 motor_3wires_diam=10;
 motor_wire_length=115;
 
-motor_frontarm_length=propeller_radius*2;
+motor_frontarm_length=propeller_radius*1.5;//*2
 motor_backarm_length=propeller_radius*1.3;
 motor_arm_add=30;
 //motor_arm_add_front=body_width/2/cos(30)-motor_mount_radius*tan(30);
@@ -31,7 +32,7 @@ motor_arm_add=30;
 
 motor_arm_height=motor_mount_height;
 
-nw_front=5;
+nw_front=4;
 nw_back=3;
 
 leg_width = 10;
@@ -188,7 +189,7 @@ module assembly(){
 	translate([0,drofly_pos,0])DroFly();
 }
 
-assembly();
+rotate([0,0,90])assembly();
 
 //#################
 //#### Additional parts
