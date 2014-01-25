@@ -52,6 +52,8 @@ back_entraxe=40;//to be asked to black body
 front_entraxe=40;//to be asked to black body
 front_arm_fix_width=50;// to be asked to baptiste to puzzle him, then claude, than the black
 
+body_back_arm_fix_height=body_height*cos(30);
+
 ///////////////
 module body_2_frontarms(){
 	trapeze(body_width,body_width-front_arm_fix_width*sin(30)*2,front_arm_fix_width*cos(30),thick);
@@ -87,12 +89,18 @@ module body_front(){ //battery
 		}
 	}
 
-	translate([0,-body_length*0.3,17])
+	translate([0,-body_length*0.3,17+2*thick])
 		battery_big();
+
+    for(i=[-1:1]){for(j=[1:3]){
+        translate([i*body_width/3,-j*body_front_length/4,0])cylinder(h=3.5*thick,r=thick);
+    }}
 
 	translate([0,(front_arm_fix_width*cos(30))/2,0])body_2_frontarms();
 }
 //body_front();
+
+
 
 module body_back(){  //electronics
 	difference(){
@@ -123,13 +131,13 @@ module body_back(){  //electronics
 			DroFly();
 
 // back arms fix
-				translate([0,-body_back_length/2+thick,0])
-					body_2_backarms();
+				translate([0,-body_back_length/2+thick,body_back_arm_fix_height/2-body_height/2])
+					body_2_backarms(body_back_arm_fix_height);
 			
 
 }
 
-module body_2_backarms_p1(){
+module body_2_backarms_p1(body_height){
 translate([-body_height*tan(30)/2,0,0]){
 rotate([0,-30,0])
 	difference(){
@@ -147,14 +155,14 @@ rotate([0,-30,0])
 }
 }
 
-module body_2_backarms(){
+module body_2_backarms(body_height){
 
 difference(){
 
 	union(){
 	translate([body_width/2,0,0])
-	body_2_backarms_p1();
-	translate([-body_width/2,0,0])rotate([0,0,180])body_2_backarms_p1();
+	body_2_backarms_p1(body_height);
+	translate([-body_width/2,0,0])rotate([0,0,180])body_2_backarms_p1(body_height);
 
 	//This is the bottom plate
 	translate([0,0,-body_height/2+thick/2])cube([body_width,back_entraxe*3/2,thick],center=true);
@@ -185,7 +193,7 @@ difference(){
 
 }
 
-//body_2_backarms();
+//body_2_backarms(bbb);
 
 //body_back();
 
