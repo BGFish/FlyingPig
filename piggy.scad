@@ -48,8 +48,7 @@ elec_offset=20;
 body_front_length=170;
 body_back_length=body_length-body_front_length;
 
-back_entraxe=40;//to be asked to black body
-front_entraxe=40;//to be asked to black body
+
 front_arm_fix_width=50;// to be asked to baptiste to puzzle him, then claude, than the black
 back_arm_fix_width=front_arm_fix_width;//back_entraxe*3/2;
 
@@ -58,12 +57,45 @@ body_back_arm_fix_height=body_height*cos(30);
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
 arm_length=150;
-//arm_fix_width=60;
-arm_fix_height=30;
+arm_fix_height=body_height;
 arm_fix_entraxe=40;
+back_entraxe=arm_fix_entraxe;
+front_entraxe=arm_fix_entraxe;
+
+//##############
+//##### Assembly,
+//sub-parts: 4*arm_mirrored,body_back,body_front
+// body:preassembly of body_back and body_front
+module assembly(){
+	rotate([0,0,(180-angle_front)/2])
+	translate([motor_arm_add,0,0])
+		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
+	mirror([1,0,0])rotate([0,0,(180-angle_front)/2])
+		translate([motor_arm_add,0,0])
+		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
+	translate([0,-body_length,0]){
+		rotate([0,-angle_tail,0])
+		translate([motor_arm_add,0,0])
+			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
+		mirror([1,0,0])rotate([0,-angle_tail,0])
+			translate([motor_arm_add,0,0])
+			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
+}
+	body();
+	//translate([0,battery_pos,0])battery_big();
+	//translate([0,drofly_pos,0])DroFly();
+}
+
+rotate([0,0,90])assembly();
+
+module body(){
+	body_front();
+	translate([0,-body_front_length-body_back_length/2,body_height/2])body_back();
+}
 
 
-
+//##############
+//#### Part: body_front
 
 ///////////////
 module body_2_frontarms(){
@@ -111,7 +143,8 @@ module body_front(){ //battery
 }
 //body_front();
 
-
+//##############
+//#### Part: body_back
 
 module body_back(){  //electronics
 	difference(){
@@ -204,170 +237,11 @@ difference(){
 
 }
 
-//body_2_backarms(bbb);
-
 //body_back();
-
-module body2(){
-	body_front();
-	translate([0,-body_front_length-body_back_length/2,body_height/2])body_back();
-}
-
-//body2();
-
-////////////
-
-//##############
-//#### Part: motor_arm
-//#Sub modules: motor_mount, moto_arm_fix
-module motor_mount(){
-//%translate([-79,-16.5,-25])import("scorpion/Rear_Motor_Mounts.stl");
-	%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
-	difference(){
-		cylinder(h=motor_mount_height,r=motor_mount_radius+thick);
-		translate([0,0,thick])
-			cylinder(h=motor_mount_height,r=motor_mount_radius);
-		translate([motor_radius,-motor_3wires_diam/2,thick])
-			cube([motor_radius,motor_3wires_diam,motor_mount_height]);
-	}
-}
-
-//motor_mount();
-
-module motor_arm_fix(){
-	difference(){
-		translate([0,-motor_mount_radius,0])cube([thick,2*motor_mount_radius,motor_mount_height]);
-		translate([0,0,motor_mount_height/2])rotate([0,90,0])
-		union(){
-			translate([0,-1.5*motor_mount_radius/2,0])cylinder(h=3*thick,r=bolts_radius,center=true);
-			translate([0,1.5*motor_mount_radius/2,0])cylinder(h=3*thick,r=bolts_radius,center=true);
-			cylinder(h=3*thick,r=motor_3wires_diam/2,center=true);
-		}
-	}
-}
-
-module motor_arm_wally(){
-	difference(){
-		translate([0,-motor_mount_radius,0])cube([thick,2*motor_mount_radius,motor_mount_height]);
-		translate([0,0,motor_mount_height/2])rotate([0,90,0])
-		union(){
-			cylinder(h=3*thick,r=motor_3wires_diam/2,center=true);
-		}
-	}
-}
-
-module motor_arm(motor_arm_length,n_wallies){
-	translate([motor_arm_length,0,0])mirror([1,0,0])
-		motor_mount();
-	translate([0,motor_mount_radius,0])
-		cube([motor_arm_length,thick,motor_arm_height]);
-	translate([0,-thick-motor_mount_radius,0])
-		cube([motor_arm_length,thick,motor_arm_height]);
-	
-	motor_arm_fix();
-
-	translate([motor_arm_length-motor_wire_length,0,motor_arm_height/2])
-		ESC();
-
-	incr=motor_arm_length/n_wallies;
-	I=incr*(n_wallies-1);
-	for ( i=[incr:incr:I] ){
-		translate([i,0,0])
-			motor_arm_wally();
-
-	// essai
-	translate([i-incr,-motor_mount_radius,0])
-	rotate([0,0,(360/3.14)*motor_mount_radius/i])
-		cube([incr*1.1,thick,motor_arm_height/4]);
-	translate([i-incr,motor_mount_radius,0])
-	rotate([0,0,-(360/3.14)*motor_mount_radius/i])
-		cube([incr*1.1,thick,motor_arm_height/4]);
-	}
-
-	translate([0,-motor_mount_radius,0])
-	rotate([0,0,(360/3.14)*motor_mount_radius/motor_arm_length])
-		cube([motor_arm_length,thick,motor_arm_height/4]);
-	translate([0,motor_mount_radius,0])
-	rotate([0,0,-(360/3.14)*motor_mount_radius/motor_arm_length])
-		cube([motor_arm_length,thick,motor_arm_height/4]);
-}
-
-//motor_arm(motor_frontarm_length,5);
-
-//##############
-//#### Part: body
-module body(){
-//translate([0,-body_length/2,0])scale([0.3,1,0.1])sphere(r=body_length/2);
-	translate([-body_width/2,-body_length/2,body_height/2])
-		cube([thick,body_length,body_height],center=true);
-	translate([body_width/2,-body_length/2,body_height/2])
-		cube([thick,body_length,body_height],center=true);
-	translate([0,-body_length/2,0])legs();
-
-// body_arm_join() positioning
-	rotate([0,0,(180-angle_front)/2])
-		body_arm_join();
-	mirror([1,0,0])rotate([0,0,(180-angle_front)/2])
-		body_arm_join();
-	translate([0,-body_length,0]){
-		rotate([0,-angle_tail,0])
-			body_arm_join();
-		mirror([1,0,0])rotate([0,-angle_tail,0])
-			body_arm_join();
-	}
-}
-
-module body_arm_join(){
-translate([motor_arm_add-thick,0,0])
-	motor_arm_fix();
-}
-
 //body();
 
-module legs(){
-color("orange")
-translate([body_width/2,-body_length/4,-body_height])
-cube([leg_width,leg_length,leg_height],center=true);
-
-color("orange")
-translate([-body_width/2,-body_length/4,-body_height])
-cube([leg_width,leg_length,leg_height],center=true);
-
-color("orange")
-translate([body_width/2,body_length/2,-body_height])
-cube([leg_width,leg_length,leg_height],center=true);
-
-color("orange")
-translate([-body_width/2,body_length/2,-body_height])
-cube([leg_width,leg_length,leg_height],center=true);
-}
-
 //##############
-//##### Assembly
-module assembly(){
-	rotate([0,0,(180-angle_front)/2])
-	translate([motor_arm_add,0,0])
-		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
-	mirror([1,0,0])rotate([0,0,(180-angle_front)/2])
-		translate([motor_arm_add,0,0])
-		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
-	translate([0,-body_length,0]){
-		rotate([0,-angle_tail,0])
-		translate([motor_arm_add,0,0])
-			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
-		mirror([1,0,0])rotate([0,-angle_tail,0])
-			translate([motor_arm_add,0,0])
-			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
-}
-	body2();
-	//translate([0,battery_pos,0])battery_big();
-	//translate([0,drofly_pos,0])DroFly();
-}
-
-rotate([0,0,90])assembly();
-
-//##############
-//#### Part: arm
+//#### Part: arm (arm_mirrored better positioned)
 //#Sub modules: motor_mount, arm_wally, arm_fix
 module motor_mount(){
 	%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
@@ -380,7 +254,6 @@ module motor_mount(){
 	}
 }
 
-
 module arm_wally(height,width,thickness){
 	translate([0,0,height/2])
 	difference(){
@@ -389,7 +262,6 @@ module arm_wally(height,width,thickness){
 			cylinder(h=3*thickness,r=motor_3wires_diam/2,center=true);
 	}
 }
-
 
 module arm_fix(height,width,thickness){
 	difference(){
@@ -403,7 +275,6 @@ module arm_fix(height,width,thickness){
 		}
 	}
 }
-
 
 //arm(arm_length,60,3);
 
@@ -470,10 +341,10 @@ module DroFly(){
 color("yellow")
 cube([50,50,25],center=true);
 }
-
 //DroFly();
 
-
+//#################
+//#### Handy tools
 
 module demitrapeze(base,top,height,thick){
 	linear_extrude(height=thick)
