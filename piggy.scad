@@ -51,8 +51,19 @@ body_back_length=body_length-body_front_length;
 back_entraxe=40;//to be asked to black body
 front_entraxe=40;//to be asked to black body
 front_arm_fix_width=50;// to be asked to baptiste to puzzle him, then claude, than the black
+back_arm_fix_width=front_arm_fix_width;//back_entraxe*3/2;
 
 body_back_arm_fix_height=body_height*cos(30);
+
+//Gab variables
+motor_mount_outradius=motor_mount_radius+thick;
+arm_length=150;
+//arm_fix_width=60;
+arm_fix_height=30;
+arm_fix_entraxe=40;
+
+
+
 
 ///////////////
 module body_2_frontarms(){
@@ -336,17 +347,17 @@ cube([leg_width,leg_length,leg_height],center=true);
 module assembly(){
 	rotate([0,0,(180-angle_front)/2])
 	translate([motor_arm_add,0,0])
-		motor_arm(motor_frontarm_length,nw_front);
+		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
 	mirror([1,0,0])rotate([0,0,(180-angle_front)/2])
 		translate([motor_arm_add,0,0])
-		motor_arm(motor_frontarm_length,nw_front);
+		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
 	translate([0,-body_length,0]){
 		rotate([0,-angle_tail,0])
 		translate([motor_arm_add,0,0])
-			motor_arm(motor_backarm_length,nw_back);
+			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
 		mirror([1,0,0])rotate([0,-angle_tail,0])
 			translate([motor_arm_add,0,0])
-			motor_arm(motor_backarm_length,nw_back);
+			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
 }
 	body2();
 	//translate([0,battery_pos,0])battery_big();
@@ -354,6 +365,87 @@ module assembly(){
 }
 
 rotate([0,0,90])assembly();
+
+//##############
+//#### Part: arm
+//#Sub modules: motor_mount, arm_wally, arm_fix
+module motor_mount(){
+	%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
+	difference(){
+		cylinder(h=motor_mount_height,r=motor_mount_outradius);
+		translate([0,0,thick])
+			cylinder(h=motor_mount_height,r=motor_mount_radius);
+		translate([motor_radius,-motor_3wires_diam/2,thick])
+			cube([motor_radius,motor_3wires_diam,motor_mount_height]);
+	}
+}
+
+
+module arm_wally(height,width,thickness){
+	translate([0,0,height/2])
+	difference(){
+		cube([thickness,width,height],center=true);
+		rotate([0,90,0])
+			cylinder(h=3*thickness,r=motor_3wires_diam/2,center=true);
+	}
+}
+
+
+module arm_fix(height,width,thickness){
+	difference(){
+		arm_wally(height,width,thickness);
+		translate([0,0,height/2])rotate([0,90,0])
+		union(){
+			translate([0,-arm_fix_entraxe/2,0])
+				cylinder(h=3*thickness,r=bolts_radius,center=true);
+			translate([0,arm_fix_entraxe/2,0])
+				cylinder(h=3*thickness,r=bolts_radius,center=true);
+		}
+	}
+}
+
+
+//arm(arm_length,60,3);
+
+module arm(arm_length,arm_fix_width,n_wallies){
+arm_angle_h=atan((arm_fix_width-2*motor_mount_outradius)/(2*arm_length));
+arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
+	//motor mount
+	motor_mount();
+
+	//side walls
+	translate([0,motor_mount_radius,0]) 
+	rotate([0,0,arm_angle_h]) 
+	rotate([0,-90,-90])
+	demitrapeze(motor_mount_height,arm_fix_height,arm_length,thick);
+
+	translate([0,-motor_mount_radius-thick,0]) 
+	rotate([0,0,-arm_angle_h])
+	rotate([0,-90,-90])
+	demitrapeze(motor_mount_height,arm_fix_height,arm_length,thick);
+
+	//wallies
+	incr=arm_length/(n_wallies+1);
+	for ( i=[1:1:n_wallies] ){
+		translate([i*incr,0,0])
+			arm_wally(motor_mount_height+i*incr*sin(arm_angle_v),2*(motor_mount_outradius+i*incr*sin(arm_angle_h)),thick);
+	}
+
+	//floor
+	translate([arm_length/2,0,0])
+	rotate([0,0,-90])
+	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length,thick);
+
+	//fixation
+	translate([arm_length,0,0])
+	arm_fix(arm_fix_height,arm_fix_width,2*thick);
+}
+
+module arm_mirrored(arm_length,arm_fix_width,n_wallies){
+    mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies);
+}
+
+//arm_mirrored(arm_length,front_arm_fix_width,3);
 
 //#################
 //#### Additional parts
@@ -383,7 +475,10 @@ cube([50,50,25],center=true);
 
 
 
-
+module demitrapeze(base,top,height,thick){
+	linear_extrude(height=thick)
+		polygon(points=[[0,0],[base,0],[top,height],[0,height]],paths=[ [0,1,2,3] ]);
+}
 
 module trapeze(base,top,height,thick){
      linear_extrude(height=thick)
