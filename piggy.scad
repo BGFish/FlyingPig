@@ -62,24 +62,56 @@ arm_fix_entraxe=40;
 back_entraxe=arm_fix_entraxe;
 front_entraxe=arm_fix_entraxe;
 
+
+//Thiago & Jeff variables
+// Front foot variables
+foot_support_height = 30;
+foot_height = 5;
+
+front_foot_thickness = 15;
+front_foot_support_width = 2*(motor_mount_radius + thick);
+front_foot_width = 0.75*front_foot_support_width;
+front_foot_D = 10;	// Distance between the supports
+
+// Back foot variables
+back_foot_thickness = 15;
+back_foot_support_width = body_width/2;
+back_foot_width = 1.2*back_foot_support_width;
+back_foot_D_1 = 16;	// Distance between the supports
+back_foot_D_2 = 7.1;	// Distance between the supports
+back_foot_pos_1 = -2;	// Distance between the supports
+back_foot_pos_2 = 18;	// Distance between the supports
+back_foot_dx = -11;
+
+
 //##############
 //##### Assembly,
 //sub-parts: 4*arm_mirrored,body_back,body_front
 // body:preassembly of body_back and body_front
 module assembly(){
+
+	//Front arms
 	rotate([0,0,(180-angle_front)/2])
-	translate([motor_arm_add,0,0])
+	translate([motor_arm_add-thick,thick*5,0]){
 		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
+		translate([motor_frontarm_length*0.5,0,0])foot_front();
+	}
+		
 	mirror([1,0,0])rotate([0,0,(180-angle_front)/2])
-		translate([motor_arm_add,0,0])
-		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
+		translate([motor_arm_add-thick,thick*5,0]){
+			arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
+			translate([motor_frontarm_length*0.5,0,0])foot_front();
+		}
+		
+	//Back arms
 	translate([0,-body_length,0]){
 		rotate([0,-angle_tail,0])
-		translate([motor_arm_add,0,0])
+		translate([motor_arm_add,0,-thick*8])
 			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
 		mirror([1,0,0])rotate([0,-angle_tail,0])
-			translate([motor_arm_add,0,0])
+			translate([motor_arm_add,0,-thick*8])
 			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
+			rotate([0,0,90])back_feet();
 }
 	body();
 	//translate([0,battery_pos,0])battery_big();
@@ -317,6 +349,93 @@ module arm_mirrored(arm_length,arm_fix_width,n_wallies){
 }
 
 //arm_mirrored(arm_length,front_arm_fix_width,3);
+
+
+//##############
+//#### Part: feet
+//#Sub modules: foot_support
+
+module foot_support(height,width,distance)
+{
+	dummyAlpha=atan((pow(height,2)-pow(thick,2))/(height*distance - sqrt(pow(distance,2)+pow(height,2)-pow(thick,2))));
+
+	dummyLength = height/sin(dummyAlpha) + thick/tan(dummyAlpha);
+	dummyDelta = thick*cos(dummyAlpha);
+	translate([0,0,-dummyDelta])rotate([dummyAlpha,0,0])cube([width,dummyLength,thick]);
+}
+
+module foot_front()
+{
+	dummyDiskDistance = front_foot_width - front_foot_thickness;
+	dummyLegDistance = (front_foot_support_width - front_foot_D+1.5)/2;
+	difference(){
+		union(){
+		   translate([0,0,-foot_support_height-foot_height-thick])
+			{
+				// Junction
+				translate([-front_foot_thickness/2,-front_foot_support_width/2,foot_height + foot_support_height])cube([front_foot_thickness,front_foot_support_width,thick]);
+
+				// Legs
+			
+				translate([-front_foot_thickness/2,front_foot_D/2,foot_height])foot_support(foot_support_height,front_foot_thickness,dummyLegDistance);
+				mirror([0,-1,0])translate([-front_foot_thickness/2,front_foot_D/2,foot_height])foot_support(foot_support_height,front_foot_thickness,dummyLegDistance);
+				
+				// Foot
+				hull()
+				{
+					translate([0,dummyDiskDistance/2,0])cylinder(h=foot_height,r=front_foot_thickness/2,$fn=60);
+					translate([0,-dummyDiskDistance/2,0])cylinder(h=foot_height,r=front_foot_thickness/2,$fn=60);
+				}
+			}
+		}
+		union(){
+			translate([0,-front_foot_support_width/4,0])cylinder(h=3*thick,r=bolts_radius,center=true,$fn=60);
+			translate([0,front_foot_support_width/4,0])cylinder(h=3*thick,r=bolts_radius,center=true,$fn=60);
+		}
+	}
+}
+
+module foot_back()
+{
+	dummyDiskDistance = back_foot_width - back_foot_thickness;
+	difference(){
+		union(){
+		      translate([0,0,-foot_support_height-foot_height-thick])
+			{
+				// Junction
+				translate([-back_foot_thickness/2,-back_foot_support_width/2,foot_height + foot_support_height])cube([back_foot_thickness,back_foot_support_width,thick]);
+				
+				// Legs
+				translate([-back_foot_thickness/2,back_foot_pos_1,foot_height])foot_support(foot_support_height,back_foot_thickness,back_foot_D_1);
+				translate([-back_foot_thickness/2,-back_foot_pos_2,foot_height])foot_support(foot_support_height,back_foot_thickness,back_foot_D_2);
+				
+				// Foot
+				hull()
+				{
+					translate([0,dummyDiskDistance/2+back_foot_dx,0])cylinder(h=foot_height,r=back_foot_thickness/2,$fn=60);
+					translate([0,-dummyDiskDistance/2+back_foot_dx,0])cylinder(h=foot_height,r=back_foot_thickness/2,$fn=60);
+				}
+			}
+		}
+		union(){
+			cylinder(h=3*thick,r=bolts_radius,center=true,$fn=60);
+		}
+	}
+}
+
+module back_feet(){
+	mirror([0,1,0])translate([0,-back_foot_support_width/2,0])foot_back();
+	translate([0,-back_foot_support_width/2,0])foot_back();
+}
+
+
+//foot_front();
+
+//back_feet();
+
+//motor_arm(100);
+
+
 
 //#################
 //#### Additional parts
