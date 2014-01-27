@@ -19,7 +19,6 @@ angle_tail=30;//angle between back arm and horizontal
 
 frontarm_length=propeller_radius*1.5;//*2
 backarm_length=propeller_radius*1.3;
-motor_arm_add=30;
 
 motor_radius=28/2;
 jeu=2;
@@ -28,17 +27,8 @@ motor_mount_height=16; // dimension D
 motor_3wires_diam=10;
 motor_wire_length=115;
 
-motor_arm_height=motor_mount_height;
-
-nw_front=4;
+nw_front=4;// number of wallies for front arm
 nw_back=3;
-
-leg_width = 10;
-leg_length = 10;
-leg_height = 55;
-
-battery_pos=-100;
-drofly_pos=-210;
 
 electronic_size=50;//DroFly: 50mmx50mm
 elec_offset=20;
@@ -46,20 +36,17 @@ elec_offset=20;
 body_front_length=170;
 body_back_length=body_length-body_front_length;
 
-
-front_arm_fix_width=50;// to be asked to baptiste to puzzle him, then claude, than the black
-back_arm_fix_width=front_arm_fix_width;//back_entraxe*3/2;
+front_arm_fix_width=50;// width used to fix the front arms
+back_arm_fix_width=front_arm_fix_width;
 
 body_back_arm_fix_height=body_height*cos(angle_tail);
 
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
-arm_length=150;
 arm_fix_height=body_height;
 arm_fix_entraxe=40;
 back_entraxe=arm_fix_entraxe;
 front_entraxe=arm_fix_entraxe;
-
 
 //Thiago & Jeff variables
 // Front foot variables
@@ -87,11 +74,10 @@ back_foot_dx = -11;
 //sub-parts: 4*arm_mirrored,body_back,body_front
 // body:preassembly of body_back and body_front
 module assembly(){
-
 	//Front arms
-	frontR_arm_positioned();// front-right arm	
+	frontR_armAndFoot_positioned();// front-right arm	
 	mirror([1,0,0])
-		frontR_arm_positioned();	//front-left arm
+		frontR_armAndFoot_positioned();	//front-left arm
 	//Back arms
 	backR_arm_positioned();
 	mirror([1,0,0])backR_arm_positioned();
@@ -99,18 +85,16 @@ module assembly(){
 	translate([0,-body_length,0])
 		rotate([0,0,90])back_feet();
 	body();
-	//translate([0,battery_pos,0])battery_big();
-	//translate([0,drofly_pos,0])DroFly();
 }
 
-rotate([0,0,90])assembly();
+assembly();
 
 module body(){
 	body_front();
 	translate([0,-body_front_length-body_back_length/2,body_height/2])body_back();
 }
 
-module frontR_arm_positioned(){
+module frontR_armAndFoot_positioned(){
 	translate([body_width/2-front_arm_fix_width*sin(angle_front)/2,front_arm_fix_width*cos(angle_front)/2,0])
 	rotate([0,0,angle_front]){
 		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front);
@@ -119,38 +103,33 @@ module frontR_arm_positioned(){
 }
 
 module backR_arm_positioned(){
-	translate([0,-body_length,0])
+	translate([body_width/2,-body_length+thick,0])
 	rotate([0,-angle_tail,0])
-	translate([motor_arm_add,0,-thick*8])
 		arm_mirrored(backarm_length,back_arm_fix_width,nw_back);
 }
 //##############
 //#### Part: body_front
 
 ///////////////
-module body_2_frontarms(){
-	trapeze(body_width,body_width-front_arm_fix_width*sin(30)*2,front_arm_fix_width*cos(30),thick);
-
+module body_2_frontarms(){// body to front_arms junction
 	difference(){
-		trapeze(body_width,body_width-front_arm_fix_width*sin(30)*2,front_arm_fix_width*cos(30),body_height);
+		trapeze(body_width,body_width-front_arm_fix_width*sin(angle_front)*2,front_arm_fix_width*cos(angle_front),body_height);
 
-		translate([0,-thick,thick])trapeze(body_width-thick*2,body_width-front_arm_fix_width*sin(30)*2-thick*2,front_arm_fix_width*cos(30),body_height
+		translate([0,-thick,thick])trapeze(body_width-thick*2,body_width-front_arm_fix_width*sin(angle_front)*2-thick*2,front_arm_fix_width*cos(angle_front),body_height
 );
-	for(side=[-1,1]){
-		translate([side*((body_width+body_width-front_arm_fix_width*sin(30)*2)/4-thick*0.8),0,body_height/2])rotate([0,0,side*30]){
+		for(side=[-1,1]){
+		translate([side*(body_width/2-front_arm_fix_width*sin(angle_front)/2-thick*0.8+0/2/cos(angle_front)),0,body_height/2])
+		rotate([0,90,side*angle_front]){
 			for(i=[-1,1]){
 				translate([0,i*front_entraxe/2,0])
-				rotate([0,90,0])
 					cylinder(h=2*thick,r=bolts_radius,center=true);
 			}
-			rotate([0,90,0])
-				cylinder(h=2*thick,r=motor_3wires_diam/2,center=true);
+			cylinder(h=2*thick,r=motor_3wires_diam/2,center=true);
 		}
-}
+		}
 	}
 }
 //body_2_frontarms();
-
 
 module body_front(){ //battery
 	translate([0,-body_front_length/2,body_height/2])
@@ -164,13 +143,13 @@ module body_front(){ //battery
 	}
 
 	translate([0,-body_length*0.3,17+2*thick])
-		battery_big();
+		%battery_big();
 
     for(i=[-1:1]){for(j=[1:3]){
         translate([i*body_width/3,-j*body_front_length/4,0])cylinder(h=3.5*thick,r=thick);
     }}
 
-	translate([0,(front_arm_fix_width*cos(30))/2,0])body_2_frontarms();
+	translate([0,(front_arm_fix_width*cos(angle_front))/2,0])body_2_frontarms();
 }
 //body_front();
 
@@ -203,7 +182,7 @@ module body_back(){  //electronics
 		}
 	}
 		translate([0,elec_offset,0])
-			DroFly();
+			%DroFly();
 
 // back arms fix
 				translate([0,-body_back_length/2+thick,body_back_arm_fix_height/2-body_height/2])
@@ -213,10 +192,10 @@ module body_back(){  //electronics
 }
 
 module body_2_backarms_p1(body_height){
-translate([-body_height*tan(30)/2,0,0]){
-rotate([0,-30,0])
+translate([-body_height*tan(angle_tail)/2,0,0]){
+rotate([0,-angle_tail,0])
 	difference(){
-		cube([thick,back_entraxe*3/2,body_height/cos(30)],center=true);
+		cube([thick,back_entraxe*3/2,body_height/cos(angle_tail)],center=true);
 		for(i=[-1,1]){
 			translate([0,i*back_entraxe/2,0])
 			rotate([0,90,0])
@@ -226,7 +205,7 @@ rotate([0,-30,0])
 			cylinder(h=2*thick,r=motor_3wires_diam/2,center=true);
 		}
 
-	//cube([body_height*tan(30),back_entraxe*3/2,thick],center=true);
+	//cube([body_height*tan(angle_tail),back_entraxe*3/2,thick],center=true);
 }
 }
 
@@ -247,16 +226,16 @@ difference(){
 		translate([0,back_entraxe*3/4,0])
 			cube([body_width,thick,body_height],center=true);
 		translate([0,back_entraxe*3/4,-thick/2])
-			cube([body_width-body_height*tan(30)*2,thick*2,body_height+thick*2],center=true);
+			cube([body_width-body_height*tan(angle_tail)*2,thick*2,body_height+thick*2],center=true);
 	}
 
 	//This is the back trapezuuus
-		translate([0,-back_entraxe*3/4+thick])rotate([90,0,0])trapeze(body_width,body_width-body_height*tan(30)*2,body_height,thick);     
+		translate([0,-back_entraxe*3/4+thick])rotate([90,0,0])trapeze(body_width,body_width-body_height*tan(angle_tail)*2,body_height,thick);     
 
 	// This is the reinforcements
 	difference(){
-		translate([0,back_entraxe*1/4+thick])rotate([90,0,0])trapeze(body_width,body_width-body_height*tan(30)*2,body_height,thick);
-		translate([0,back_entraxe*1/4+thick/2,-thick/2])cube([body_width-body_height*tan(30)*2,thick*2,body_height+thick*2],center=true);
+		translate([0,back_entraxe*1/4+thick])rotate([90,0,0])trapeze(body_width,body_width-body_height*tan(angle_tail)*2,body_height,thick);
+		translate([0,back_entraxe*1/4+thick/2,-thick/2])cube([body_width-body_height*tan(angle_tail)*2,thick*2,body_height+thick*2],center=true);
 	}
 	}//End of union
 
