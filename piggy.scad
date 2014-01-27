@@ -3,7 +3,7 @@
 //import("scorpion/Front_Legs.stl");
 //import("scorpion/Front_Top.stl");
 //import("scorpion/Rear_Body.stl");
-$fn=30;
+$fn=40;
 
 inch=25.4;
 
@@ -153,6 +153,7 @@ module body_2_frontarms(){
 }
 //body_2_frontarms();
 
+
 module body_front(){ //battery
 	translate([0,-body_front_length/2,body_height/2])
 	difference(){
@@ -194,7 +195,7 @@ module body_back(){  //electronics
 				cube([body_width+thick*2,back_entraxe*3/2,body_height],center=true);
 			}
 			translate([0,elec_offset,0])
-			for (i=[-1,1])for(j=[-1,1]){
+			for (i=[-1,1]) for(j=[-1,1]){
 				translate([i*45/2,j*45/2,-body_height/2])cylinder(h=3*thick,r=bolts_radius,center=true);
 			}
 
@@ -383,14 +384,14 @@ module foot_front()
 				// Foot
 				hull()
 				{
-					translate([0,dummyDiskDistance/2,0])cylinder(h=foot_height,r=front_foot_thickness/2,$fn=60);
-					translate([0,-dummyDiskDistance/2,0])cylinder(h=foot_height,r=front_foot_thickness/2,$fn=60);
+					translate([0,dummyDiskDistance/2,0])cylinder(h=foot_height,r=front_foot_thickness/2);
+					translate([0,-dummyDiskDistance/2,0])cylinder(h=foot_height,r=front_foot_thickness/2);
 				}
 			}
 		}
 		union(){
-			translate([0,-front_foot_support_width/4,0])cylinder(h=3*thick,r=bolts_radius,center=true,$fn=60);
-			translate([0,front_foot_support_width/4,0])cylinder(h=3*thick,r=bolts_radius,center=true,$fn=60);
+			translate([0,-front_foot_support_width/4,0])cylinder(h=3*thick,r=bolts_radius,center=true);
+			translate([0,front_foot_support_width/4,0])cylinder(h=3*thick,r=bolts_radius,center=true);
 		}
 	}
 }
@@ -412,13 +413,13 @@ module foot_back()
 				// Foot
 				hull()
 				{
-					translate([0,dummyDiskDistance/2+back_foot_dx,0])cylinder(h=foot_height,r=back_foot_thickness/2,$fn=60);
-					translate([0,-dummyDiskDistance/2+back_foot_dx,0])cylinder(h=foot_height,r=back_foot_thickness/2,$fn=60);
+					translate([0,dummyDiskDistance/2+back_foot_dx,0])cylinder(h=foot_height,r=back_foot_thickness/2);
+					translate([0,-dummyDiskDistance/2+back_foot_dx,0])cylinder(h=foot_height,r=back_foot_thickness/2);
 				}
 			}
 		}
 		union(){
-			cylinder(h=3*thick,r=bolts_radius,center=true,$fn=60);
+			cylinder(h=3*thick,r=bolts_radius,center=true);
 		}
 	}
 }
