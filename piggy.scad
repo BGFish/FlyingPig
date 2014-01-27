@@ -6,10 +6,7 @@
 $fn=40;
 
 inch=25.4;
-
 thick=2;
-jeu=2;
-
 bolts_radius=3/2;//M3
 
 propeller_radius=9*inch/2;
@@ -17,14 +14,15 @@ body_length=290;
 body_width=60;
 body_height=30;
 
-angle_front=120;
-angle_tail=30;
+angle_front=30;//angle between front arm and Left-Right axis
+angle_tail=30;//angle between back arm and horizontal
 
-motor_frontarm_length=propeller_radius*1.5;//*2
-motor_backarm_length=propeller_radius*1.3;
+frontarm_length=propeller_radius*1.5;//*2
+backarm_length=propeller_radius*1.3;
 motor_arm_add=30;
 
 motor_radius=28/2;
+jeu=2;
 motor_mount_radius=motor_radius+jeu/2;
 motor_mount_height=16; // dimension D
 motor_3wires_diam=10;
@@ -52,7 +50,7 @@ body_back_length=body_length-body_front_length;
 front_arm_fix_width=50;// to be asked to baptiste to puzzle him, then claude, than the black
 back_arm_fix_width=front_arm_fix_width;//back_entraxe*3/2;
 
-body_back_arm_fix_height=body_height*cos(30);
+body_back_arm_fix_height=body_height*cos(angle_tail);
 
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
@@ -91,28 +89,15 @@ back_foot_dx = -11;
 module assembly(){
 
 	//Front arms
-	rotate([0,0,(180-angle_front)/2])
-	translate([motor_arm_add-thick,thick*5,0]){
-		arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
-		translate([motor_frontarm_length*0.5,0,0])foot_front();
-	}
-		
-	mirror([1,0,0])rotate([0,0,(180-angle_front)/2])
-		translate([motor_arm_add-thick,thick*5,0]){
-			arm_mirrored(motor_frontarm_length,front_arm_fix_width,nw_front);
-			translate([motor_frontarm_length*0.5,0,0])foot_front();
-		}
-		
+	frontR_arm_positioned();// front-right arm	
+	mirror([1,0,0])
+		frontR_arm_positioned();	//front-left arm
 	//Back arms
-	translate([0,-body_length,0]){
-		rotate([0,-angle_tail,0])
-		translate([motor_arm_add,0,-thick*8])
-			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
-		mirror([1,0,0])rotate([0,-angle_tail,0])
-			translate([motor_arm_add,0,-thick*8])
-			arm_mirrored(motor_backarm_length,back_arm_fix_width,nw_back);
-			rotate([0,0,90])back_feet();
-}
+	backR_arm_positioned();
+	mirror([1,0,0])backR_arm_positioned();
+
+	translate([0,-body_length,0])
+		rotate([0,0,90])back_feet();
 	body();
 	//translate([0,battery_pos,0])battery_big();
 	//translate([0,drofly_pos,0])DroFly();
@@ -125,7 +110,20 @@ module body(){
 	translate([0,-body_front_length-body_back_length/2,body_height/2])body_back();
 }
 
+module frontR_arm_positioned(){
+	translate([body_width/2-front_arm_fix_width*sin(angle_front)/2,front_arm_fix_width*cos(angle_front)/2,0])
+	rotate([0,0,angle_front]){
+		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front);
+		translate([frontarm_length*0.5,0,0])foot_front();
+	}
+}
 
+module backR_arm_positioned(){
+	translate([0,-body_length,0])
+	rotate([0,-angle_tail,0])
+	translate([motor_arm_add,0,-thick*8])
+		arm_mirrored(backarm_length,back_arm_fix_width,nw_back);
+}
 //##############
 //#### Part: body_front
 
