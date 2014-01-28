@@ -172,7 +172,7 @@ module body_front(){ //battery
         translate([i*body_width/3,-j*body_front_length/4,0])cylinder(h=3.5*thick,r=thick);
     }}
 
-	translate([0,(front_arm_fix_width*cos(30))/2,0])body_2_frontarms();
+	translate([0,(front_arm_fix_width*cos(30)) /2,0])body_2_frontarms();
 }
 //body_front();
 
@@ -270,6 +270,7 @@ difference(){
 
 }
 
+
 //body_back();
 //body();
 
@@ -348,6 +349,7 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 module arm_mirrored(arm_length,arm_fix_width,n_wallies){
     mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies);
 }
+
 
 //arm_mirrored(arm_length,front_arm_fix_width,3);
 
