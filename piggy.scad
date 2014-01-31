@@ -310,16 +310,13 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	motor_mount();
 
 	//side walls
-	translate([0,motor_mount_radius,0]) 
-	rotate([0,0,arm_angle_h]) 
+	for (i=[-1,1]){
+	translate([0,i*motor_mount_radius+(i-1)/2*thick,0]) 
+	rotate([0,0,i*arm_angle_h]) 
 	rotate([0,-90,-90])
 	demitrapeze(motor_mount_height,arm_fix_height,arm_length,thick);
-
-	translate([0,-motor_mount_radius-thick,0]) 
-	rotate([0,0,-arm_angle_h])
-	rotate([0,-90,-90])
-	demitrapeze(motor_mount_height,arm_fix_height,arm_length,thick);
-
+    }
+    
 	//wallies
 	incr=arm_length/(n_wallies+1);
 	for ( i=[1:1:n_wallies] ){
