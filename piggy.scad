@@ -97,7 +97,7 @@ module body(){
 module frontR_armAndFoot_positioned(){
 	translate([body_width/2-front_arm_fix_width*sin(angle_front)/2,front_arm_fix_width*cos(angle_front)/2,0])
 	rotate([0,0,angle_front]){
-		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front);
+		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
 		translate([frontarm_length*0.5,0,0])foot_front();
 	}
 }
@@ -105,7 +105,7 @@ module frontR_armAndFoot_positioned(){
 module backR_arm_positioned(){
 	translate([body_width/2,-body_length+thick,0])
 	rotate([0,-angle_tail,0])
-		arm_mirrored(backarm_length,back_arm_fix_width,nw_back);
+		arm_mirrored(backarm_length,back_arm_fix_width,nw_back,false);
 }
 //##############
 //#### Part: body_front
@@ -254,7 +254,7 @@ difference(){
 //#### Part: arm (arm_mirrored better positioned)
 //#Sub modules: motor_mount, arm_wally, arm_fix
 module motor_mount(){
-	%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
+	//%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
 	difference(){
 		cylinder(h=motor_mount_height,r=motor_mount_outradius);
 		translate([0,0,thick])
@@ -288,7 +288,7 @@ module arm_fix(height,width,thickness){
 
 //arm(arm_length,60,3);
 
-module arm(arm_length,arm_fix_width,n_wallies){
+module arm(arm_length,arm_fix_width,n_wallies,isFootfixed){
 arm_angle_h=atan((arm_fix_width-2*motor_mount_outradius)/(2*arm_length));
 arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	//motor mount
@@ -317,13 +317,25 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	rotate([0,0,-90])
 	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length,thick);
 
-	//fixation
+	//fixation vers body
 	translate([arm_length,0,0])
 	arm_fix(arm_fix_height,arm_fix_width,2*thick);
+	
+	//fixation vers foot
+    if(isFootfixed){
+	translate([arm_length/2,0,0])rotate([0,0,90])
+	difference(){
+	    trapeze(1.3*(arm_fix_width+motor_radius)/2,1.25*(arm_fix_width+motor_radius)/2,arm_length/2/n_wallies,thick);
+        for (i=[-1,1]){
+            translate([i*front_foot_support_width/4,0,0])
+            cylinder(h=3*thick,r=bolts_radius,center=true);
+        }	    
+    }
+    }
 }
 
-module arm_mirrored(arm_length,arm_fix_width,n_wallies){
-    mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies);
+module arm_mirrored(arm_length,arm_fix_width,n_wallies,isFootfixed){
+    mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
 }
 
 //arm_mirrored(arm_length,front_arm_fix_width,3);
