@@ -41,6 +41,9 @@ back_arm_fix_width=front_arm_fix_width;
 
 body_back_arm_fix_height=body_height*cos(angle_tail);
 
+serre_hole1=3;// serre-cable holes dimensions
+serre_hole2=6;
+
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
 arm_fix_height=body_height;
@@ -140,6 +143,9 @@ module body_front(){ //battery
 		for(i=[-1,1]){
 			translate([i*3*body_width/8,0,0])rotate([90,0,0])cylinder(h=100*thick,r=bolts_radius);
 		}
+		for(i=[-1,1]){for(j=[-2:2]){
+			translate([i*(body_width/2-thick-serre_hole1/2),j*body_front_length/5,-body_height/2])cube([serre_hole1,serre_hole2,4*thick],center=true);
+		}}
 	}
 
 	translate([0,-body_length*0.3,17+2*thick])
