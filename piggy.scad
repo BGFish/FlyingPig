@@ -87,6 +87,8 @@ module assembly(){
 	translate([0,-body_length,0])
 		rotate([0,0,90])back_feet();
 	body();
+	
+	%translate([0,0,body_height+thick/2+1])capot();
 }
 
 assembly();
@@ -438,7 +440,16 @@ module back_feet(){
 
 //motor_arm(100);
 
-
+add_capot=8;
+module capot(){
+    translate([0,-(body_length-back_arm_fix_width/2)/2+add_capot/2,0])
+        cube([body_width,body_length-back_arm_fix_width/2-add_capot,thick],center=true);
+    translate([0,-body_length+body_back_length/2+elec_offset,0])
+        cylinder(h=thick,r=electronic_size*1.42/2+2*thick,center=true);
+    translate([0,front_arm_fix_width*cos(angle_front)/2-1,-thick/2])
+        trapeze(body_width,body_width-(2-0.2)*front_arm_fix_width*sin(angle_front),front_arm_fix_width*cos(angle_front),thick);
+}
+//%translate([0,0,body_height+thick/2+1])capot();
 
 //#################
 //#### Additional parts
