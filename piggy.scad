@@ -243,7 +243,12 @@ difference(){
 	translate([0,0,-body_height/2-thick/2])cube([body_width*1.1,back_entraxe*3/2*1.1,thick],center=true);
 
 	translate([0,0,body_height/2+thick/2])cube([body_width*1.1,back_entraxe*3/2*1.1,thick],center=true);
-	}// End of cleaning difference
+	
+    for (i=[-1,1]){
+        translate([i*back_foot_support_width/2,-back_entraxe/4,-body_height/2])
+        cylinder(h=3*thick,r=bolts_radius,center=true);
+    }
+    }// End of cleaning difference
 
 }
 
