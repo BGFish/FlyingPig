@@ -12,23 +12,22 @@ bolts_radius=3/2;//M3
 propeller_radius=9*inch/2;
 body_length=290;
 body_width=60;
-body_height=30;
+body_height=33;
 
 angle_front=30;//angle between front arm and Left-Right axis
 angle_tail=30;//angle between back arm and horizontal
 
-frontarm_length=propeller_radius*1.5;//*2
+frontarm_length=propeller_radius*1.6;
 backarm_length=propeller_radius*1.3;
 
 motor_radius=28/2;
 jeu=2;
 motor_mount_radius=motor_radius+jeu/2;
 motor_mount_height=16; // dimension D
-motor_3wires_diam=10;
-motor_wire_length=115;
+motor_3wires_diam=12;
 
-nw_front=4;// number of wallies for front arm
-nw_back=3;
+nw_front=3;// number of wallies for front arm
+nw_back=2;
 
 electronic_size=50;//DroFly: 50mmx50mm
 elec_offset=20;
@@ -36,10 +35,13 @@ elec_offset=20;
 body_front_length=170;
 body_back_length=body_length-body_front_length;
 
-front_arm_fix_width=50;// width used to fix the front arms
+front_arm_fix_width=52;// width used to fix the front arms
 back_arm_fix_width=front_arm_fix_width;
 
 body_back_arm_fix_height=body_height*cos(angle_tail);
+
+serre_hole1=3;// serre-cable holes dimensions
+serre_hole2=6;
 
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
@@ -85,6 +87,8 @@ module assembly(){
 	translate([0,-body_length,0])
 		rotate([0,0,90])back_feet();
 	body();
+	
+	%translate([0,0,body_height+thick/2+1])capot();
 }
 
 assembly();
@@ -97,15 +101,18 @@ module body(){
 module frontR_armAndFoot_positioned(){
 	translate([body_width/2-front_arm_fix_width*sin(angle_front)/2,front_arm_fix_width*cos(angle_front)/2,0])
 	rotate([0,0,angle_front]){
-		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front);
+		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
 		translate([frontarm_length*0.5,0,0])foot_front();
+		%translate([1.15*frontarm_length/nw_front,0,0])ESC();
 	}
 }
 
 module backR_arm_positioned(){
 	translate([body_width/2,-body_length+thick,0])
-	rotate([0,-angle_tail,0])
-		arm_mirrored(backarm_length,back_arm_fix_width,nw_back);
+	rotate([0,-angle_tail,0]){
+		arm_mirrored(backarm_length,back_arm_fix_width,nw_back,false);
+		%translate([1.0*backarm_length/nw_back,0,0])ESC();
+	}
 }
 //##############
 //#### Part: body_front
@@ -140,9 +147,12 @@ module body_front(){ //battery
 		for(i=[-1,1]){
 			translate([i*3*body_width/8,0,0])rotate([90,0,0])cylinder(h=100*thick,r=bolts_radius);
 		}
+		for(i=[-1,1]){for(j=[-2:2]){
+			translate([i*(body_width/2-thick-serre_hole1/2),j*body_front_length/5,-body_height/2])cube([serre_hole1,serre_hole2,4*thick],center=true);
+		}}
 	}
 
-	translate([0,-body_length*0.3,17+2*thick])
+	translate([0,-body_length*0.3,26/2+2*thick])
 		%battery_big();
 
     for(i=[-1:1]){for(j=[1:3]){
@@ -243,7 +253,12 @@ difference(){
 	translate([0,0,-body_height/2-thick/2])cube([body_width*1.1,back_entraxe*3/2*1.1,thick],center=true);
 
 	translate([0,0,body_height/2+thick/2])cube([body_width*1.1,back_entraxe*3/2*1.1,thick],center=true);
-	}// End of cleaning difference
+	
+    for (i=[-1,1]){
+        translate([i*back_foot_support_width/2,-back_entraxe/4,-body_height/2])
+        cylinder(h=3*thick,r=bolts_radius,center=true);
+    }
+    }// End of cleaning difference
 
 }
 
@@ -254,7 +269,7 @@ difference(){
 //#### Part: arm (arm_mirrored better positioned)
 //#Sub modules: motor_mount, arm_wally, arm_fix
 module motor_mount(){
-	%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
+	//%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
 	difference(){
 		cylinder(h=motor_mount_height,r=motor_mount_outradius);
 		translate([0,0,thick])
@@ -288,23 +303,20 @@ module arm_fix(height,width,thickness){
 
 //arm(arm_length,60,3);
 
-module arm(arm_length,arm_fix_width,n_wallies){
+module arm(arm_length,arm_fix_width,n_wallies,isFootfixed){
 arm_angle_h=atan((arm_fix_width-2*motor_mount_outradius)/(2*arm_length));
 arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	//motor mount
 	motor_mount();
 
 	//side walls
-	translate([0,motor_mount_radius,0]) 
-	rotate([0,0,arm_angle_h]) 
+	for (i=[-1,1]){
+	translate([0,i*motor_mount_radius+(i-1)/2*thick,0]) 
+	rotate([0,0,i*arm_angle_h]) 
 	rotate([0,-90,-90])
 	demitrapeze(motor_mount_height,arm_fix_height,arm_length,thick);
-
-	translate([0,-motor_mount_radius-thick,0]) 
-	rotate([0,0,-arm_angle_h])
-	rotate([0,-90,-90])
-	demitrapeze(motor_mount_height,arm_fix_height,arm_length,thick);
-
+    }
+    
 	//wallies
 	incr=arm_length/(n_wallies+1);
 	for ( i=[1:1:n_wallies] ){
@@ -317,13 +329,25 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	rotate([0,0,-90])
 	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length,thick);
 
-	//fixation
+	//fixation vers body
 	translate([arm_length,0,0])
 	arm_fix(arm_fix_height,arm_fix_width,2*thick);
+	
+	//fixation vers foot
+    if(isFootfixed){
+	translate([(arm_length)*(1-1/n_wallies)/2,0,0])rotate([0,0,90])
+	difference(){
+	    trapeze(1.25*(arm_fix_width+motor_radius)/2,1.15*(arm_fix_width+motor_radius)/2,arm_length/2/n_wallies,thick);
+        for (i=[-1,1]){
+            translate([i*front_foot_support_width/4,0,0])
+            cylinder(h=3*thick,r=bolts_radius,center=true);
+        }	    
+    }
+    }
 }
 
-module arm_mirrored(arm_length,arm_fix_width,n_wallies){
-    mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies);
+module arm_mirrored(arm_length,arm_fix_width,n_wallies,isFootfixed){
+    mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
 }
 
 //arm_mirrored(arm_length,front_arm_fix_width,3);
@@ -413,7 +437,16 @@ module back_feet(){
 
 //motor_arm(100);
 
-
+add_capot=8;
+module capot(){
+    translate([0,-(body_length-back_arm_fix_width/2)/2+add_capot/2,0])
+        cube([body_width,body_length-back_arm_fix_width/2-add_capot,thick],center=true);
+    translate([0,-body_length+body_back_length/2+elec_offset,0])
+        cylinder(h=thick,r=electronic_size*1.42/2+2*thick,center=true);
+    translate([0,front_arm_fix_width*cos(angle_front)/2-1,-thick/2])
+        trapeze(body_width,body_width-(2-0.2)*front_arm_fix_width*sin(angle_front),front_arm_fix_width*cos(angle_front),thick);
+}
+//%translate([0,0,body_height+thick/2+1])capot();
 
 //#################
 //#### Additional parts
