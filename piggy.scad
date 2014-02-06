@@ -349,9 +349,9 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	}
 
 	//floor
-	translate([arm_length/2,0,0])
+	translate([arm_length/2+motor_mount_radius/2,0,0])
 	rotate([0,0,-90])
-	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length,thick);
+	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length-motor_mount_radius,thick);
 
 	//fixation vers body
 	translate([arm_length,0,0])
