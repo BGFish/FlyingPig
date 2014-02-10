@@ -76,8 +76,23 @@ back_foot_dx = -11;
 
 // Generate STLs
 
+//Back of body
 //body_back();
+
+//Front of body
 //body_front();
+
+//Back feet
+//rotate([0, 90, 0]) back_feet();
+
+//Back arms
+//arm_mirrored(backarm_length,back_arm_fix_width,nw_back,false);
+
+//Front arms
+//arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
+
+//Front feet
+rotate([0, 90, 0]) foot_front();
 
 
 //##############
@@ -200,7 +215,7 @@ module body_back(){  //electronics
 		translate([0,2*thick,thick])cube([body_width/2,body_back_length,body_height],center=true);
 		for(i=[-1,1]){
 			for(j=[-1,1]){
-			%translate([i*3*body_width/8,body_front_length/2,j*body_height/8*2])rotate([90,0,0])cylinder(h=20*thick,r=bolts_radius);
+			translate([i*3*body_width/8,body_front_length/2,j*body_height/8*2])rotate([90,0,0])cylinder(h=20*thick,r=bolts_radius);
 			}
 		}
 
@@ -277,7 +292,7 @@ difference(){
 
 }
 
-body_back();
+//body_back();
 //body();
 
 //##############
