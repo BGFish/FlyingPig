@@ -74,6 +74,12 @@ back_foot_pos_2 = 18;	// Distance between the supports
 back_foot_dx = -11;
 
 
+// Generate STLs
+
+//body_back();
+//body_front();
+
+
 //##############
 //##### Assembly,
 //sub-parts: 4*arm_mirrored,body_back,body_front
@@ -94,7 +100,7 @@ module assembly(){
 	%translate([0,0,body_height+thick/2+1])capot();
 }
 
-assembly();
+//assembly();
 
 module body(){
 	body_front();
@@ -148,7 +154,9 @@ module body_front(){ //battery
 		translate([0,thick,thick])cube([body_width-2*thick,body_front_length,body_height],center=true);
 		translate([0,-2*thick,thick])cube([body_width/2,body_front_length,body_height],center=true);
 		for(i=[-1,1]){
-			translate([i*3*body_width/8,0,0])rotate([90,0,0])cylinder(h=100*thick,r=bolts_radius);
+			for(j=[-1,1]){
+			translate([i*3*body_width/8,-body_back_length/2,j*body_height/8*2])rotate([90,0,0])cylinder(h=20*thick,r=bolts_radius);
+			}
 		}
 		for(i=[-1,1]){for(j=[-2:2]){
 			translate([i*(body_width/2-thick-serre_hole1/2),j*body_front_length/5,-body_height/2])cube([serre_hole1,serre_hole2,4*thick],center=true);
@@ -191,8 +199,12 @@ module body_back(){  //electronics
 
 		translate([0,2*thick,thick])cube([body_width/2,body_back_length,body_height],center=true);
 		for(i=[-1,1]){
-			translate([i*3*body_width/8,0,0])rotate([-90,0,0])cylinder(h=100*thick,r=bolts_radius);
+			for(j=[-1,1]){
+			%translate([i*3*body_width/8,body_front_length/2,j*body_height/8*2])rotate([90,0,0])cylinder(h=20*thick,r=bolts_radius);
+			}
 		}
+
+
 	}
 		translate([0,elec_offset,0])
 			%DroFly();
@@ -265,7 +277,7 @@ difference(){
 
 }
 
-//body_back();
+body_back();
 //body();
 
 //##############
