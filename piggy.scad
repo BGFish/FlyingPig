@@ -25,6 +25,9 @@ jeu=2;
 motor_mount_radius=motor_radius+jeu/2;
 motor_mount_height=16; // dimension D
 motor_3wires_diam=12;
+motor_screw_radius=1.5; // M3 From http://www.hobbyking.com/hobbyking/store/__36408__Turnigy_Aerodrive_SK3_2830_1020kv_Brushless_Outrunner_Motor_EU_warehouse_.html
+motor_screw_separation = 16; // Idem
+motor_hold_width=10;
 
 nw_front=3;// number of wallies for front arm
 nw_back=2;
@@ -272,12 +275,33 @@ module motor_mount(){
 	//%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
 	difference(){
 		cylinder(h=motor_mount_height,r=motor_mount_outradius);
-		translate([0,0,thick])
-			cylinder(h=motor_mount_height,r=motor_mount_radius);
+		translate([0,0,-thick])
+			cylinder(h=motor_mount_height+2*thick,r=motor_mount_radius);
 		translate([motor_radius,-motor_3wires_diam/2,thick])
 			cube([motor_radius,motor_3wires_diam,motor_mount_height]);
 	}
+	difference() {
+		union() {
+		translate([0, 0, thick/2]) {
+			rotate([0,0,45]) cube([motor_radius*2+thick*2,motor_hold_width,thick],center = true);
+			rotate([0,0,-45]) cube([motor_radius*2+thick*2,motor_hold_width,thick],center = true);
+		}
+		
+		}
+		
+
+		for (i=[-1,1]){
+			for (j=[-1,1]){
+				translate([i*motor_screw_separation/2*cos(45),j*motor_screw_separation/2*sin(45) , -motor_mount_height/2 ])
+					cylinder(h=motor_mount_height, r=motor_screw_radius);
+			}
+		}
+		translate([0,0, - motor_mount_height/2])
+			cylinder(h=motor_mount_height, r=5+0.25);
+	}
 }
+
+//motor_mount();
 
 module arm_wally(height,width,thickness){
 	translate([0,0,height/2])
@@ -325,9 +349,9 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
 	}
 
 	//floor
-	translate([arm_length/2,0,0])
+	translate([arm_length/2+motor_mount_radius/2,0,0])
 	rotate([0,0,-90])
-	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length,thick);
+	trapeze(0.5*motor_mount_outradius,0.3*arm_fix_width,arm_length-motor_mount_radius,thick);
 
 	//fixation vers body
 	translate([arm_length,0,0])
@@ -437,16 +461,28 @@ module back_feet(){
 
 //motor_arm(100);
 
-add_capot=8;
+add_capot=6;
+reach_walls=1.06;
 module capot(){
     translate([0,-(body_length-back_arm_fix_width/2)/2+add_capot/2,0])
-        cube([body_width,body_length-back_arm_fix_width/2-add_capot,thick],center=true);
+        //difference() {
+        	cube([body_width,body_length-back_arm_fix_width/2-add_capot,thick],center=true);
+        	//translate([(body_width/2-thick/2),-thick + (body_length-back_arm_fix_width/2-add_capot)/2, -thick/2]) cylinder(h=thick*2,r=1,center=true);
+        //}
     translate([0,-body_length+body_back_length/2+elec_offset,0])
-        cylinder(h=thick,r=electronic_size*1.42/2+2*thick,center=true);
+    	difference() {
+        	cylinder(h=thick,r=electronic_size*1.42/2+2*thick,center=true);
+        	for(i=[-1,1]) {
+        		for(j=[-1,1]) {
+        			translate([i*electronic_size*1.42/2*cos(30)*reach_walls, j*electronic_size*1.42/2*sin(30)*reach_walls, -thick/2]) cylinder(h=thick*2,r=1,center=true);
+        		}
+        	}
+    	}
     translate([0,front_arm_fix_width*cos(angle_front)/2-1,-thick/2])
         trapeze(body_width,body_width-(2-0.2)*front_arm_fix_width*sin(angle_front),front_arm_fix_width*cos(angle_front),thick);
 }
 //%translate([0,0,body_height+thick/2+1])capot();
+
 
 //#################
 //#### Additional parts
