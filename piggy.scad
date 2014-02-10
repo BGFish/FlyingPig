@@ -297,7 +297,7 @@ module motor_mount(){
 			}
 		}
 		translate([0,0, - motor_mount_height/2])
-			cylinder(h=motor_mount_height, r=5+0.25);
+			cylinder(h=motor_mount_height, r=2+0.25);
 	}
 }
 
