@@ -25,8 +25,9 @@ jeu=2;
 motor_mount_radius=motor_radius+jeu/2;
 motor_mount_height=16; // dimension D
 motor_3wires_diam=12;
-motor_screw_radius=1.5; // M3 From http://www.hobbyking.com/hobbyking/store/__36408__Turnigy_Aerodrive_SK3_2830_1020kv_Brushless_Outrunner_Motor_EU_warehouse_.html
-motor_screw_separation = 16; // Idem
+motor_screw_radius=0.6; // M3 From http://www.hobbyking.com/hobbyking/store/__36408__Turnigy_Aerodrive_SK3_2830_1020kv_Brushless_Outrunner_Motor_EU_warehouse_.html
+motor_screw_separation_small = 16; // Much more complicated than expected
+motor_screw_separation_large = 19; // Much more complicated than expected
 motor_hold_width=10;
 
 nw_front=3;// number of wallies for front arm
@@ -92,7 +93,7 @@ back_foot_dx = -11;
 //arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
 
 //Front feet
-rotate([0, 90, 0]) foot_front();
+//rotate([0, 90, 0]) foot_front();
 
 
 //##############
@@ -318,17 +319,22 @@ module motor_mount(){
 		
 
 		for (i=[-1,1]){
-			for (j=[-1,1]){
-				translate([i*motor_screw_separation/2*cos(45),j*motor_screw_separation/2*sin(45) , -motor_mount_height/2 ])
-					cylinder(h=motor_mount_height, r=motor_screw_radius);
-			}
+			translate([i*motor_screw_separation_small/2*cos(45),-i*motor_screw_separation_small/2*sin(45) , -motor_mount_height/2 ])
+				cylinder(h=motor_mount_height, r=motor_screw_radius);
 		}
+
+
+		for (i=[-1,1]){
+			translate([i*motor_screw_separation_large/2*cos(45),i*motor_screw_separation_large/2*sin(45) , -motor_mount_height/2 ])
+				cylinder(h=motor_mount_height, r=motor_screw_radius);
+		}
+
 		translate([0,0, - motor_mount_height/2])
-			cylinder(h=motor_mount_height, r=2+0.25);
+			cylinder(h=motor_mount_height, r=3.5+0.25);
 	}
 }
 
-//motor_mount();
+motor_mount();
 
 module arm_wally(height,width,thickness){
 	translate([0,0,height/2])
