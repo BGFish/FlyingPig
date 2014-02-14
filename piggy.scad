@@ -1,8 +1,3 @@
-//translate([0,0,-100])import("scorpion/Final_V_tail_Complete.stl");
-//import("scorpion/Front_Body.stl");
-//import("scorpion/Front_Legs.stl");
-//import("scorpion/Front_Top.stl");
-//import("scorpion/Rear_Body.stl");
 $fn=40;
 
 inch=25.4;
@@ -87,10 +82,10 @@ back_foot_dx = -11;
 //rotate([0, 90, 0]) back_feet();
 
 //Back arms
-//arm_mirrored(backarm_length,back_arm_fix_width,nw_back,false);
+arm(backarm_length,back_arm_fix_width,nw_back,false);
 
 //Front arms
-arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
+//arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
 
 //Front feet
 //rotate([0, 90, 0]) foot_front();
