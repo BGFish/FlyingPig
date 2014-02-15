@@ -82,10 +82,10 @@ back_foot_dx = -11;
 //rotate([0, 90, 0]) back_feet();
 
 //Back arms
-arm(backarm_length,back_arm_fix_width,nw_back,false);
+//arm(backarm_length,back_arm_fix_width,nw_back,false);
 
 //Front arms
-//arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
+arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
 
 //Front feet
 //rotate([0, 90, 0]) foot_front();
@@ -93,16 +93,15 @@ arm(backarm_length,back_arm_fix_width,nw_back,false);
 
 //##############
 //##### Assembly,
-//sub-parts: 4*arm_mirrored,body_back,body_front
+//sub-parts: 4*arm_rotated,body_back,body_front
 // body:preassembly of body_back and body_front
 module assembly(){
 	//Front arms
-	frontR_armAndFoot_positioned();// front-right arm	
-	mirror([1,0,0])
-		frontR_armAndFoot_positioned();	//front-left arm
+	front_armAndFoot_positioned(isRight=1);// front-right arm
+    front_armAndFoot_positioned(isRight=-1);	//front-left arm
 	//Back arms
-	backR_arm_positioned();
-	mirror([1,0,0])backR_arm_positioned();
+	back_arm_positioned(isRight=1);
+	back_arm_positioned(isRight=-1);
 
 	translate([0,-body_length,0])
 		rotate([0,0,90])back_feet();
@@ -118,19 +117,19 @@ module body(){
 	translate([0,-body_front_length-body_back_length/2,body_height/2])body_back();
 }
 
-module frontR_armAndFoot_positioned(){
-	translate([body_width/2-front_arm_fix_width*sin(angle_front)/2,front_arm_fix_width*cos(angle_front)/2,0])
-	rotate([0,0,angle_front]){
-		arm_mirrored(frontarm_length,front_arm_fix_width,nw_front,true);
+module front_armAndFoot_positioned(isRight){
+	translate([isRight*(body_width/2-front_arm_fix_width*sin(angle_front)/2),front_arm_fix_width*cos(angle_front)/2,0])
+	rotate([0,0,(1-isRight)*90+isRight*angle_front]){
+		arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
 		translate([frontarm_length*0.5,0,0])foot_front();
 		%translate([1.15*frontarm_length/nw_front,0,0])ESC();
 	}
 }
 
-module backR_arm_positioned(){
-	translate([body_width/2,-body_length+thick,0])
-	rotate([0,-angle_tail,0]){
-		arm_mirrored(backarm_length,back_arm_fix_width,nw_back,false);
+module back_arm_positioned(isRight){
+    translate([isRight*body_width/2,-body_length+thick,0])
+	rotate([0,-angle_tail,90*(isRight-1)]){
+		arm_rotated(backarm_length,back_arm_fix_width,nw_back,false);
 		%translate([1.0*backarm_length/nw_back,0,0])ESC();
 	}
 }
@@ -292,7 +291,7 @@ difference(){
 //body();
 
 //##############
-//#### Part: arm (arm_mirrored better positioned)
+//#### Part: arm (arm_rotated better positioned)
 //#Sub modules: motor_mount, arm_wally, arm_fix
 module motor_mount(){
 	//%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
@@ -398,11 +397,11 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
     }
 }
 
-module arm_mirrored(arm_length,arm_fix_width,n_wallies,isFootfixed){
-    mirror([1,0,0])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
+module arm_rotated(arm_length,arm_fix_width,n_wallies,isFootfixed){
+    rotate([0,0,180])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
 }
 
-//arm_mirrored(arm_length,front_arm_fix_width,3);
+//arm_rotated(200,front_arm_fix_width,3);
 
 
 //##############
@@ -432,7 +431,7 @@ module foot_front()
 				// Legs
 			
 				translate([-front_foot_thickness/2,front_foot_D/2,foot_height])foot_support(foot_support_height,front_foot_thickness,dummyLegDistance);
-				mirror([0,-1,0])translate([-front_foot_thickness/2,front_foot_D/2,foot_height])foot_support(foot_support_height,front_foot_thickness,dummyLegDistance);
+				rotate([0,0,180])translate([-front_foot_thickness/2,front_foot_D/2,foot_height])foot_support(foot_support_height,front_foot_thickness,dummyLegDistance);
 				
 				// Foot
 				hull()
@@ -478,7 +477,8 @@ module foot_back()
 }
 
 module back_feet(){
-	mirror([0,1,0])translate([0,-back_foot_support_width/2,0])foot_back();
+	rotate([0,0,180])
+	    translate([0,-back_foot_support_width/2,0])foot_back();
 	translate([0,-back_foot_support_width/2,0])foot_back();
 }
 
