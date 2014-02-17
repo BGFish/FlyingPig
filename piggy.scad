@@ -75,6 +75,7 @@ escspace_w=28;  //width
 escspace_h=11;  //height
 escspace_d_from_motor=60; //distance between motor axis and motor-side of ESC
 escspace_d_from_motor2=92; //one ESC has a different layout, with 3 wires on motor-side
+//TODO: ESC space z-position is obtained experimentally here, arm_fix_height/2.3
 
 // Generate STLs
 
@@ -88,10 +89,10 @@ escspace_d_from_motor2=92; //one ESC has a different layout, with 3 wires on mot
 //rotate([0, 90, 0]) back_feet();
 
 //Back arms
-//arm(backarm_length,back_arm_fix_width,nw_back,false);
+//arm_rotated(backarm_length,back_arm_fix_width,nw_back,false);
 
 //Front arms
-//arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
+arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
 
 //Front feet
 //rotate([0, 90, 0]) foot_front();
@@ -116,7 +117,7 @@ module assembly(){
 	%translate([0,0,body_height+thick/2+1])capot();
 }
 
-assembly();
+//assembly();
 
 module body(){
 	body_front();
