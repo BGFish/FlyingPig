@@ -20,7 +20,7 @@ jeu=2;
 motor_mount_radius=motor_radius+jeu/2;
 motor_mount_height=16; // dimension D
 motor_3wires_diam=12;
-motor_screw_radius=0.6; // M3 From http://www.hobbyking.com/hobbyking/store/__36408__Turnigy_Aerodrive_SK3_2830_1020kv_Brushless_Outrunner_Motor_EU_warehouse_.html
+motor_screw_radius=3/2; // M3 From http://www.hobbyking.com/hobbyking/store/__36408__Turnigy_Aerodrive_SK3_2830_1020kv_Brushless_Outrunner_Motor_EU_warehouse_.html
 motor_screw_separation_small = 16; // Much more complicated than expected
 motor_screw_separation_large = 19; // Much more complicated than expected
 motor_hold_width=10;
@@ -69,6 +69,12 @@ back_foot_pos_1 = -2;	// Distance between the supports
 back_foot_pos_2 = 18;	// Distance between the supports
 back_foot_dx = -11;
 
+// Leave space for ESCs in different arms
+escspace_l=75;  //length
+escspace_w=28;  //width
+escspace_h=11;  //height
+escspace_d_from_motor=60; //distance between motor axis and motor-side of ESC
+escspace_d_from_motor2=92; //one ESC has a different layout, with 3 wires on motor-side
 
 // Generate STLs
 
@@ -85,7 +91,7 @@ back_foot_dx = -11;
 //arm(backarm_length,back_arm_fix_width,nw_back,false);
 
 //Front arms
-arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
+//arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
 
 //Front feet
 //rotate([0, 90, 0]) foot_front();
@@ -110,7 +116,7 @@ module assembly(){
 	%translate([0,0,body_height+thick/2+1])capot();
 }
 
-//assembly();
+assembly();
 
 module body(){
 	body_front();
@@ -122,7 +128,7 @@ module front_armAndFoot_positioned(isRight){
 	rotate([0,0,(1-isRight)*90+isRight*angle_front]){
 		arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
 		translate([frontarm_length*0.5,0,0])foot_front();
-		%translate([1.15*frontarm_length/nw_front,0,0])ESC();
+		//%translate([1.15*frontarm_length/nw_front,0,0])ESC();
 	}
 }
 
@@ -130,7 +136,7 @@ module back_arm_positioned(isRight){
     translate([isRight*body_width/2,-body_length+thick,0])
 	rotate([0,-angle_tail,90*(isRight-1)]){
 		arm_rotated(backarm_length,back_arm_fix_width,nw_back,false);
-		%translate([1.0*backarm_length/nw_back,0,0])ESC();
+		//%translate([1.0*backarm_length/nw_back,0,0])ESC();
 	}
 }
 //##############
@@ -397,10 +403,21 @@ arm_angle_v=atan((arm_fix_height-motor_mount_height)/arm_length);
     }
 }
 
-module arm_rotated(arm_length,arm_fix_width,n_wallies,isFootfixed){
-    rotate([0,0,180])translate([-arm_length-thick,0,0])arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
-}
 
+
+module arm_rotated(arm_length,arm_fix_width,n_wallies,isFootfixed){
+    rotate([0,0,180])translate([-arm_length-thick,0,0])
+    difference(){
+        arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
+        translate([escspace_d_from_motor+escspace_l/2,0,arm_fix_height/2.3]){
+            cube([escspace_l,escspace_w,escspace_h],center=true);
+            %ESC();
+            //space needed: 75x28x9 (9+2, assuming that bridging may induce 2mm error), the capacitor has a 12.5 diameter
+            }
+            
+    }    
+}
+//assembly();
 //arm_rotated(200,front_arm_fix_width,3);
 
 
@@ -515,9 +532,11 @@ module capot(){
 //#################
 //#### Additional parts
 module ESC(){
-color("red")
-//cube([33,23,6],center=true); //flyduino
-translate([0,0,7/2])cube([36,26,7],center=true);	//grotek
+color("red"){
+translate([0,0,0*7/2])cube([59,26,7],center=true);//measured on 17-02-2014
+translate([22,0,0*7/2])rotate([90,0,0])cylinder(h=22,r=12.5/2,center=true);
+//space needed: 75x28x9 (9+2, assuming that bridging may induce 2mm error), the capacitor has a 12.5 diameter
+}
 }
 //ESC();
 module battery_big(){
