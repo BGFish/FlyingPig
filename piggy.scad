@@ -92,10 +92,14 @@ escspace_d_from_motor2=92; //one ESC has a different layout, with 3 wires on mot
 //arm_rotated(backarm_length,back_arm_fix_width,nw_back,false);
 
 //Front arms
-arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
+//arm_rotated(frontarm_length,front_arm_fix_width,nw_front,true);
 
 //Front feet
 //rotate([0, 90, 0]) foot_front();
+
+
+// Generate GIF of assembled drone.
+//rotate([0, 0, $t*360]) translate([0, body_length*0.33, 0]) assembly();
 
 
 //##############
