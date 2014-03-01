@@ -42,6 +42,8 @@ body_back_arm_fix_height=body_height*cos(angle_tail);
 serre_hole1=3;// serre-cable holes dimensions
 serre_hole2=6;
 
+capot_width=20;
+
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
 arm_fix_height=body_height;
@@ -118,10 +120,16 @@ module assembly(){
 		rotate([0,0,90])back_feet();
 	body();
 	
-	%translate([0,0,body_height+thick/2+1])capot();
+	//translate([0,0,body_height+thick/2+1])capot();
+
+	translate([0,-capot_width,body_height/2+2*thick]) capot2();
+	translate([0,-body_front_length+capot_width,body_height/2+2*thick]) capot2();
+
 }
 
-//assembly();
+assembly();
+
+
 
 module body(){
 	body_front();
@@ -511,6 +519,8 @@ module back_feet(){
 
 //motor_arm(100);
 
+
+//Capot
 add_capot=6;
 reach_walls=1.06;
 module capot(){
@@ -533,6 +543,29 @@ module capot(){
 }
 //%translate([0,0,body_height+thick/2+1])capot();
 
+
+
+
+
+module capot2(){
+	difference(){
+		cube([body_width+2*thick,capot_width,body_height],center=true);
+
+		translate([0,0,-1.5*thick])
+		cube([body_width-4*thick,1.3*capot_width,body_height],center=true);
+
+		translate([(-body_width+thick)/2,0,-1.5*thick])
+		cube([thick,1.3*capot_width,body_height],center=true);
+
+		translate([(body_width-thick)/2,0,-1.5*thick])
+		cube([thick,1.3*capot_width,body_height],center=true);
+
+		translate([0,0,-body_height/2])
+		cube([body_width,1.3*capot_width,body_height],center=true);
+	}
+}
+
+//capot2();
 
 //#################
 //#### Additional parts
