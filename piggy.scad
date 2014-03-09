@@ -1,6 +1,6 @@
-//Hexagonal holes for electronic bolts
+//TODO
 //Higher feet
-//Add more space for ESC cables
+//Container for battery.
 
 $fn=40;
 
@@ -79,7 +79,7 @@ back_foot_dx = -11;
 escspace_l=75;  //length
 escspace_w=28;  //width
 escspace_h=11;  //height
-escspace_d_from_motor=60; //distance between motor axis and motor-side of ESC
+escspace_d_from_motor=40;//60; //distance between motor axis and motor-side of ESC
 escspace_d_from_motor2=92; //one ESC has a different layout, with 3 wires on motor-side
 //TODO: ESC space z-position is obtained experimentally here, arm_fix_height/2.3
 
@@ -172,8 +172,11 @@ union(){
 				cylinder(h=body_height,r=electronic_space/2,center=true);
 				cube([body_width-2*body_thick,2*body_tot_l,body_height],center=true);
 			}
-			for (i=[-1,1]) for(j=[-1,1]){
-				translate([i*electronic_entraxe/2,j*electronic_entraxe/2,-body_height/2])cylinder(h=3*body_bottom_thick,r=bolts_radius,center=true);
+			for (i=[-1,1]) for(j=[-1,1]){// pour fixer l'électronique
+				translate([i*electronic_entraxe/2,j*electronic_entraxe/2,-body_height/2]){
+				    cylinder(h=3*body_bottom_thick,r=bolts_radius,center=true);
+				    translate([0,0,body_bottom_thick/4])scale(1.1)m3nut();
+				    }
 			}
 			for(i=[-1,1]){for(j=[-1,1]){// pour des serre-cables
 			translate([i*(body_width/2-body_thick-serre_hole1/2),j*(electronic_space/2-3*thick),-body_height/2])cube([serre_hole1,serre_hole2,4*body_bottom_thick],center=true);
@@ -186,7 +189,7 @@ union(){
 			// for usb cable
 			translate([-body_width/2,usb_offset,elec_h])cube([body_width,usb_w,usb_h],center=true);	
 	}
-			%DroFly();
+			//%DroFly();
 
 // back arms fix
 	translate([0,-body_back_l+body_thick-body_2_backarm_l/2,body_back_arm_fix_height/2-body_height/2])
@@ -284,7 +287,7 @@ difference(){
 //#### Part: arm (arm_rotated better positioned)
 //#Sub modules: motor_mount, arm_wally, arm_fix
 module motor_mount(){
-	%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
+	%translate([0,0,45+0*motor_mount_height*2])cylinder(h=10,r=propeller_radius);
 	difference(){
 		cylinder(h=motor_mount_height,r=motor_mount_outradius);
 		translate([0,0,-thick])
@@ -393,7 +396,7 @@ module arm_rotated(arm_length,arm_fix_width,n_wallies,isFootfixed){
     rotate([0,0,180])translate([-arm_length-thick,0,0])
     difference(){
         arm(arm_length,arm_fix_width,n_wallies,isFootfixed);
-        translate([escspace_d_from_motor+escspace_l/2,0,arm_fix_height/2.3]){
+        translate([escspace_d_from_motor+escspace_l/2,0,arm_fix_height/2.6]){
             cube([escspace_l,escspace_w,escspace_h],center=true);
             %ESC();
             //space needed: 75x28x9 (9+2, assuming that bridging may induce 2mm error), the capacitor has a 12.5 diameter
@@ -526,3 +529,13 @@ module trapeze(base,top,height,thick){
      linear_extrude(height=thick)
      polygon(points=[[base/2,-height/2],[-base/2,-height/2],[-top/2,height/2],[top/2,height/2]],paths=[ [0,1,2,3] ]);
 }
+
+aaa=3.17;
+module m3nut(){
+	union(){
+		cube([5.5,aaa,body_bottom_thick/2],center=true);
+		rotate([0,0,60])cube([5.5,aaa,body_bottom_thick/2],center=true);
+		rotate([0,0,-60])cube([5.5,aaa,body_bottom_thick/2],center=true);
+    }
+}
+//scale(100)m3nut();
