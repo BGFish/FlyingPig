@@ -35,8 +35,8 @@ electronic_size=50;//DroFly: 50mmx50mm
 electronic_entraxe=45;
 electronic_space=1.4*electronic_size; //space for electronics
 
-body_front_l=electronic_space/2; //front arms fix positioning
-body_back_l=electronic_space/2; //back arms fix positioning
+body_front_l=1.1*electronic_space/2; //front arms fix positioning
+body_back_l=1.1*electronic_space/2; //back arms fix positioning
 body_tot_l=body_front_l+body_back_l;
 
 //// Arms and arms fixing.
@@ -96,7 +96,7 @@ serre_hole2=6;
 
 // Generate STLs
 //body
-//body();
+body();
 
 //Back feet
 //rotate([0, 90, 0]) back_feet();
@@ -116,7 +116,7 @@ serre_hole2=6;
 
 //##############
 //##### Assembly,
-assembly();
+//assembly();
 //sub-parts: 4*arm_rotated,body_back,body_front
 // body:preassembly of body_back and body_front
 module assembly(){
