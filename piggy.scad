@@ -42,7 +42,15 @@ body_back_arm_fix_height=body_height*cos(angle_tail);
 serre_hole1=3;// serre-cable holes dimensions
 serre_hole2=6;
 
-capot_width=20;
+capot_width=40;
+cap_tot_width=130;
+cap_mid_width=cap_tot_width-2*capot_width;
+cap_height=body_height/2;
+
+//for capot2_thicker
+capot_top=6;//capot top thickness
+capot_inside=3;
+capot_outside=3;
 
 //Gab variables
 motor_mount_outradius=motor_mount_radius+thick;
@@ -99,6 +107,10 @@ escspace_d_from_motor2=92; //one ESC has a different layout, with 3 wires on mot
 //Front feet
 //rotate([0, 90, 0]) foot_front();
 
+//Capot2
+//rotate([0,180,0])capot2_thicker();
+//rotate([0,180,0])capot3();
+
 
 // Generate GIF of assembled drone.
 //rotate([0, 0, $t*360]) translate([0, body_length*0.33, 0]) assembly();
@@ -122,8 +134,9 @@ module assembly(){
 	
 	//translate([0,0,body_height+thick/2+1])capot();
 
-	translate([0,-capot_width,body_height/2+2*thick]) capot2();
-	translate([0,-body_front_length+capot_width,body_height/2+2*thick]) capot2();
+	//translate([0,-capot_width,body_height/2+2*thick]) capot2_thicker();
+	//translate([0,-body_front_length+capot_width,body_height/2+2*thick]) capot2_thicker();
+	translate([0,-2*capot_width,body_height/2+2*thick+2*capot_top]) capot3();
 
 }
 
@@ -566,6 +579,45 @@ module capot2(){
 }
 
 //capot2();
+
+
+
+module capot2_thicker(){
+	difference(){
+		cube([body_width+2*capot_outside,capot_width,body_height],center=true);
+
+		translate([0,0,-capot_top])
+		cube([body_width-2*thick-2*capot_inside,1.3*capot_width,body_height],center=true);
+
+		translate([(-body_width+thick)/2,0,-capot_top])
+		cube([thick,1.3*capot_width,body_height],center=true);
+
+		translate([(body_width-thick)/2,0,-capot_top])
+		cube([thick,1.3*capot_width,body_height],center=true);
+
+		//translate([0,0,-body_height/2])
+		//cube([body_width,1.3*capot_width,body_height],center=true);
+	}
+}
+
+module capot3(){
+	difference(){
+		cube([body_width+2*capot_outside,cap_tot_width,cap_height],center=true);
+
+		translate([0,0,-capot_top])
+		cube([body_width-2*thick-2*capot_inside,1.3*cap_tot_width,cap_height],center=true);
+
+		translate([body_width/2,0,+capot_top])
+		cube([body_width,cap_mid_width,cap_height],center=true);
+
+		translate([(-body_width+thick)/2,0,-capot_top])
+		cube([thick,1.3*cap_tot_width,cap_height],center=true);
+
+		translate([(body_width-thick)/2,0,-capot_top])
+		cube([thick,1.3*cap_tot_width,cap_height],center=true);
+	}
+}
+//capot3();
 
 //#################
 //#### Additional parts
