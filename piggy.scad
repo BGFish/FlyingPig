@@ -251,7 +251,19 @@ difference(){
 	translate([-body_width/2,0,0])rotate([0,0,180])body_2_backarms_fix(body_height);
 
 	//This is the bottom plate
-	translate([0,0,-body_height/2+body_bottom_thick/2])cube([body_width,body_2_backarm_l,body_bottom_thick],center=true);
+	translate([0,0,-body_height/2+body_bottom_thick/2])
+	    difference(){
+	        cube([body_width,body_2_backarm_l,body_bottom_thick],center=true);
+	        
+	        //removes an annoying edge
+	        for(i=[-1,1]){   
+	            translate([i*body_width/2,0,-body_bottom_thick/2])
+	            translate([0,0,0])
+	            rotate([0,-i*30,0])
+	            translate([i*body_width/2,0,0])
+	            cube([body_width,2*body_2_backarm_l,4*body_bottom_thick],center=true);
+	        }
+	    }
 
 	//This is the front rectangles
 	translate([0,body_2_backarm_l/2-body_thick/2,0])
