@@ -96,7 +96,7 @@ serre_hole2=6;
 
 // Generate STLs
 //body
-body();
+//body();
 
 //Back feet
 //rotate([0, 90, 0]) back_feet();
@@ -112,6 +112,10 @@ body();
 
 // Generate GIF of assembled drone.
 //rotate([0, 0, $t*360]) translate([0, body_length*0.33, 0]) assembly();
+
+//renfort
+r_thick=3;
+rotate([0,90,0])renfort(arm_fix_height-3*thick,back_arm_fix_width-3*thick,r_thick);
 
 
 //##############
@@ -419,6 +423,10 @@ module arm_rotated(arm_length,arm_fix_width,n_wallies,isFootfixed){
 //assembly();
 //arm_rotated(200,front_arm_fix_width,3);
 
+module renfort(height,width,thick)
+{
+arm_fix(height,width,thick);
+}
 
 //##############
 //#### Part: feet
