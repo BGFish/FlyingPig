@@ -111,11 +111,11 @@ serre_hole2=6;
 //rotate([0, 90, 0]) foot_front();
 
 // Generate GIF of assembled drone.
-//rotate([0, 0, $t*360]) translate([0, body_length*0.33, 0]) assembly();
+rotate([0, 0, $t*360]) translate([0, body_length*0.33, 0]) assembly();
 
 //renfort
-r_thick=3;
-rotate([0,90,0])renfort(arm_fix_height-3*thick,back_arm_fix_width-3*thick,r_thick);
+//r_thick=3;
+//rotate([0,90,0])renfort(arm_fix_height-3*thick,back_arm_fix_width-3*thick,r_thick);
 
 
 //##############
