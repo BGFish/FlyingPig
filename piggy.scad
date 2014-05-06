@@ -296,13 +296,24 @@ difference(){
 //#Sub modules: motor_mount, arm_wally, arm_fix
 module motor_mount(){
 	//%translate([0,0,motor_mount_height*2])cylinder(h=thick,r=propeller_radius);
+
 	difference(){
-		cylinder(h=motor_mount_height,r=motor_mount_outradius);
+			cylinder(h=motor_mount_height,r=motor_mount_outradius);	
 		translate([0,0,-thick])
 			cylinder(h=motor_mount_height+2*thick,r=motor_mount_radius);
-		translate([motor_radius,-motor_3wires_diam/2,thick])
+		translate([motor_radius/2.,-motor_3wires_diam/2.,thick])
 			cube([motor_radius,motor_3wires_diam,motor_mount_height]);
 	}
+
+	translate([0, 0, thick]) difference() {
+		cylinder(h=thick*2, r=motor_mount_radius, center=true);
+		cylinder(h=thick*2+jeu, r=motor_mount_radius-1, center=true);
+		translate([motor_radius/2.,-motor_3wires_diam/2.,0])
+			cube([motor_radius,motor_3wires_diam,motor_mount_height]);
+		translate([0, 0, thick/2]) rotate_extrude(convexity = 10) translate([motor_radius, 0, 0]) circle(r = thick/2);
+		translate([0, 0, thick*3/2]) cylinder(h=thick*2, r=motor_mount_radius, center=true);
+	}
+
 	difference() {
 		union() {
 		translate([0, 0, thick/2]) {
@@ -326,7 +337,10 @@ module motor_mount(){
 
 		translate([0,0, - motor_mount_height/2])
 			cylinder(h=motor_mount_height, r=3.5+0.25);
+
 	}
+
+	
 }
 
 //motor_mount();
