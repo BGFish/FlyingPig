@@ -1,4 +1,4 @@
-//draft of new arm+feet modules for piggy
+//draft of new arm+feet modules for piggy 
 $fn=40;
 
 inch=25.4;
