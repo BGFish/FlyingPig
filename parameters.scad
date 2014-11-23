@@ -59,7 +59,8 @@ body_h=33;
 // Arm fixing.
 front_shoulder_w=52;
 back_shoulder_w=52;
-shoulder_s=35;
+shoulder_s_h=35;
+shoulder_s_v=15;
 
 //arm parameters
 front_arm_l=150;

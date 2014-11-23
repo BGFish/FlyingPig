@@ -38,11 +38,29 @@ module 2holes(diam,sep,h=100){
 		cylinder(h=h,r=diam/2,center=true);
 }
 
+module 4holes(diam,sepH,sepV=10,h=100){
+	translate([-sepH/2,-sepV/2+2,2])
+		cylinder(h=h,r=diam/2,center=true);
+	translate([sepH/2,-sepV/2+2,2])
+		cylinder(h=h,r=diam/2,center=true);
+	translate([-sepH/2,sepV/2+2,2])
+		cylinder(h=h,r=diam/2,center=true);
+	translate([sepH/2,sepV/2+2,])
+		cylinder(h=h,r=diam/2,center=true);
+}
+
 
 module 3holeplank(length,width,thickness,center_hole_diam,side_hole_diam,side_hole_sep){
 	difference(){
 		1holeplank(length,width,thickness,center_hole_diam);
 		2holes(side_hole_diam,side_hole_sep);
+	}
+}
+
+module 5holeplank(length,width,thickness,center_hole_diam,side_hole_diam,side_hole_sep_h,side_hole_sep_v){
+	difference(){
+		1holeplank(length,width,thickness,center_hole_diam);
+		4holes(side_hole_diam,side_hole_sep_h,side_hole_sep_v);
 	}
 }
 

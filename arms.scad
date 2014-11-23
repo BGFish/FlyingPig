@@ -14,7 +14,7 @@ module arm(arm_l=150,shoulder_w=50,shoulder_h=50){
 
 	//motor mount
 	module motor_mount(){
-		%translate([0,0,45+0*wrist_h*2])cylinder(h=10,r=propeller_r);
+		//%translate([0,0,45+0*wrist_h*2])cylinder(h=10,r=propeller_r);
 
 		difference(){
 			rotate_extrude(convexity=10)
@@ -93,7 +93,7 @@ module arm(arm_l=150,shoulder_w=50,shoulder_h=50){
 	//fixation vers body
 	translate([arm_l,0,shoulder_h/2])
 	rotate([90,0,90])
-	3holeplank(shoulder_w,shoulder_h,2*arm_t, wire_hole_d,2*bolt_r,shoulder_s );
+	5holeplank(shoulder_w,shoulder_h,2*arm_t, wire_hole_d,2*bolt_r,shoulder_s_h,shoulder_s_v );
 
 
 }

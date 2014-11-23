@@ -28,7 +28,7 @@ module body_front(){// body to front_arms junction
 				translate([i*(front_shoulder_w*sin(front_a)-body_w/2),front_shoulder_w*cos(front_a)/2,0])
 				rotate([90,0,-90-i*front_a])
 				translate([front_shoulder_w/2,body_h/2,-i*side_t/2])
-					3holeplank(front_shoulder_w,body_h,side_t,wire_hole_d,2*bolt_r,shoulder_s);
+					5holeplank(front_shoulder_w,body_h,side_t,wire_hole_d,2*bolt_r,shoulder_s_h,shoulder_s_v);
 				}
 		}
 	//cut edges
@@ -59,7 +59,7 @@ module body_back(){
 			cube([body_w,side_t,body_h],center=true);
 	
 			//This is a reinforcement
-			translate([0,back_shoulder_w/4,(body_h-side_t*sin(back_a))/2])
+			translate([0,back_shoulder_w/5,(body_h-side_t*sin(back_a))/2])
 			cube([body_w,side_t,body_h-side_t*sin(back_a)],center=true);
 			
 			//These are the shoulders
@@ -68,7 +68,7 @@ module body_back(){
 				rotate([0,i*back_a,0])
 				translate([i*(side_t)/2,0,body_h/cos(back_a)/2])
 				rotate([90,0,90])
-				3holeplank(back_shoulder_w,body_h/cos(back_a),side_t,wire_hole_d,2*bolt_r,shoulder_s);
+				5holeplank(back_shoulder_w,body_h/cos(back_a),side_t,wire_hole_d,2*bolt_r,shoulder_s_h,shoulder_s_v);
 				}	
 			}	
 		
