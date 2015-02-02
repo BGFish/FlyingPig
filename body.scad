@@ -81,7 +81,7 @@ module body_back(){
             translate([i*body_w/2,0,0])
             rotate([0,-i*back_a,0])
             translate([i*body_w/2,-side_t/2,body_h])
-            cube([body_w,back_shoulder_w+side_t,2*body_h],center=true);
+            cube([body_w+0.01,back_shoulder_w+side_t,2*body_h],center=true);
         	}	
         	
         //clean edges
